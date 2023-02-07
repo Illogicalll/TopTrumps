@@ -1,23 +1,28 @@
-# importing the modules
 import requests
 from bs4 import BeautifulSoup
 from os.path import basename
 import os
 
+# Establishing Useful Directories/Creating Ones Required
 BASE_DIR = os.getcwd()
 SETS_DIR = os.path.join(BASE_DIR,'Sets')
 if not os.path.exists(SETS_DIR):
     os.mkdir('Sets')
+
+# Scraping HTML From Main Top Trumps Page
 url = "https://www.tcdb.com/ViewAll.cfm/sp/Gaming/brand/Top%20Trumps"
 HOST_DOMAIN = "https://www.tcdb.com"
 html = requests.get(url).content
 data = BeautifulSoup(html, 'html.parser')
+
+# Finding List of Decks and Creating List of All Links
 parent = data.find("body").find_all("ul")[3]
 links = []
 for li in parent.find_all("li"):
     for link in li.find_all('a', href=True):
         links.append(link['href'])
-morepages = []
+
+# Scraping HTML From Each Specific Deck, Creating Folders For Them and Downloading the Card Images Into Them
 for page in links[1::2]:
     html = requests.get(f"{HOST_DOMAIN}{str(page).replace('Gallery','Checklist')}").content
     data = BeautifulSoup(html, 'html.parser')

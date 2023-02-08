@@ -4,7 +4,6 @@ import os
 import csv
 import pandas as pd
 
-
 # Creating List of All Card File Paths
 directories = [x[1] for x in os.walk(os.getcwd())]
 non_empty_dirs = [x for x in directories if x]

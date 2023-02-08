@@ -6,6 +6,20 @@ from country_list import countries_for_language
 import csv
 import os
 
+# Upscale Test
+image = cv2.imread("Sets/2002 Top Trumps Ultimate Military Jets/89222-6376716Fr.jpg")
+image2 = cv2.resize(image, (0,0), fx=1.5, fy=1.5)
+kernel = np.array([[0, -1, 0],
+                [-1, 5,-1],
+                [0, -1, 0]])
+image2 = cv2.filter2D(src=image2, ddepth=-1, kernel=kernel)
+# cv2.imshow('image',image2)
+# cv2.waitKey()
+reader = easyocr.Reader(['en'], gpu=False)
+header = reader.readtext(image2, detail=0)
+print(header)
+
+
 # Loading Image
 directories = [x[1] for x in os.walk(os.getcwd())]
 non_empty_dirs = [x for x in directories if x]

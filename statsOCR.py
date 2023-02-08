@@ -24,8 +24,8 @@ for set in sets:
                         [-1, 5,-1],
                         [0, -1, 0]])
         image2 = cv2.filter2D(src=image2, ddepth=-1, kernel=kernel)
-        # cv2.imshow('image',image2)
-        # cv2.waitKey()
+        cv2.imshow('image',image2)
+        cv2.waitKey()
 
         # Attempting to read stats off card
         reader = easyocr.Reader(['en'], gpu=False)

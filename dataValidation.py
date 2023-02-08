@@ -40,8 +40,6 @@ def nextim():
     img1 = ImageTk.PhotoImage(Image.open(images[curimage]))
     label.configure(image=img1)
     label.photo = img1
-    # LOAD DATA FROM OCR GENERATED STATS FILE
-    # WORKS BUT OCR KINDA SUCKS
     curset = os.listdir(SET_DIR)
     currow = []
     with open(f"{SET_DIR}/stats.csv", 'r') as f:

@@ -4,9 +4,9 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 global.__basedir = __dirname;
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+global.client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.commands = new Collection();
+global.client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -17,7 +17,7 @@ for (const folder of commandFolders) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
 		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
+			global.client.commands.set(command.data.name, command);
 		}
 		else {
 			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
@@ -25,14 +25,14 @@ for (const folder of commandFolders) {
 	}
 }
 
-client.once(Events.ClientReady, () => {
+global.client.once(Events.ClientReady, () => {
 	console.log('Ready!');
 });
 
-client.on(Events.InteractionCreate, async interaction => {
+global.client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
-	const command = client.commands.get(interaction.commandName);
+	const command = global.client.commands.get(interaction.commandName);
 
 	if (!command) return;
 
@@ -50,4 +50,4 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-client.login(token);
+global.client.login(token);

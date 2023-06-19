@@ -57,6 +57,7 @@ module.exports = {
 				let playerList = ``;
 				global.usernameQueue.forEach(function(player) {playerList += `${player} `;});
 				await i.reply({ content: `**${selection}** has been chosen! Starting the Match...\nPlayers: **${playerList}**`, components: [], ephemeral: false });
+				global.selection = selection;
 				await execute('./deal.js');
 			});
 

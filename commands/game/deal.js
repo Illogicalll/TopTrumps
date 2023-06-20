@@ -1,4 +1,4 @@
-const { EmbedBuilder, SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 const fs = require('fs');
 
 function shuffle(array) {

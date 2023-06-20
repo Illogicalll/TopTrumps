@@ -1,4 +1,4 @@
-const { StringSelectMenuBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
+const { StringSelectMenuBuilder, ActionRowBuilder, SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 const setsPath = path.join(global.__basedir, 'sets');
@@ -56,7 +56,8 @@ module.exports = {
 				// eslint-disable-next-line quotes
 				let playerList = ``;
 				global.usernameQueue.forEach(function(player) {playerList += `${player} `;});
-				await i.reply({ content: `**${selection}** has been chosen! Starting the Match...\nPlayers: **${playerList}**`, components: [], ephemeral: false });
+				const image = new AttachmentBuilder(`./sets/${selection}/cover.jpg`);
+				await i.reply({ content: `**${selection}** has been chosen! Starting the Match...\nPlayers: **${playerList}**`, components: [], files: [image], ephemeral: false });
 				global.selection = selection;
 				await execute('./deal.js');
 			});

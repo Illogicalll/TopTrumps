@@ -37,7 +37,7 @@ module.exports = {
 		}
 		else {
 			const select = new StringSelectMenuBuilder()
-				.setCustomId('Deck')
+				.setCustomId('deck')
 				.setPlaceholder('Pick a Deck...')
 				.addOptions(sets.map(set => { return { label: set, value: set }; }));
 
@@ -52,6 +52,8 @@ module.exports = {
 
 			const collector = response.createMessageComponentCollector({ time: 3_600_000 });
 			collector.on('collect', async i => {
+				if (!i.isStringSelectMenu()) return;
+				if (i.customId !== 'deck') return;
 				const selection = i.values;
 				// eslint-disable-next-line quotes
 				let playerList = ``;

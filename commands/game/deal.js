@@ -1,5 +1,15 @@
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
-const fs = require('fs');
+const { SlashCommandBuilder, AttachmentBuilder, ActionRowBuilder, StringSelectMenuBuilder, Events } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
+const csv = require('csv-parser');
+// eslint-disable-next-line prefer-const
+let playerTurn = 0;
+
+async function execute(file, ...args) {
+	const f = require(file);
+	if (!f) throw new Error('Invalid file');
+	return f.execute(...args);
+}
 
 function shuffle(array) {
 	let currentIndex = array.length;
@@ -55,6 +65,27 @@ function distributeCards(deck, numPlayers) {
 	return playerHands;
 }
 
+function getStats() {
+	return new Promise((resolve, reject) => {
+		const stats = [];
+		const statNames = [];
+		const statsPath = path.join(global.__basedir, `./sets/${global.selection}/stats.csv`);
+
+		fs.createReadStream(statsPath)
+			.pipe(csv())
+			.on('data', (data) => stats.push(data))
+			.on('end', () => {
+				for (const [key] of Object.entries(stats[0])) {
+					statNames.push(key);
+				}
+				resolve({ stats, statNames });
+			})
+			.on('error', (error) => {
+				reject(error);
+			});
+	});
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('deal')
@@ -62,12 +93,39 @@ module.exports = {
 	async execute() {
 		let deck = fs.readdirSync(`sets/${global.selection}`);
 		deck = shuffle(deck);
+		// eslint-disable-next-line prefer-const
 		let playerHands = distributeCards(deck, global.userIDQueue.length);
 		global.playerHands = playerHands;
+
+		const { stats, statNames } = await getStats();
+		global.stats = stats;
+		const select = new StringSelectMenuBuilder()
+			.setCustomId('stat')
+			.setPlaceholder('Choose a Stat...')
+			.addOptions(statNames.map(name => { return { label: name, value: name }; }));
+		const row = new ActionRowBuilder()
+			.addComponents(select);
+
 		global.userIDQueue.forEach(id => {
 			const servingUser = global.userIDQueue.indexOf(id);
 			const image = new AttachmentBuilder(`./sets/${global.selection}/${playerHands[servingUser][0]}`);
-			global.interactionQueue[servingUser].followUp({ content: 'Your Card:', files: [image], ephemeral: true });
+
+			if (playerTurn === servingUser) {
+				global.interactionQueue[servingUser].followUp({ content: 'Your Card:\n**It is your turn, choose a stat...**', files: [image], components: [row], ephemeral: true });
+			}
+			else {
+				global.interactionQueue[servingUser].followUp({ content: `Your Card:\n**It is ${global.usernameQueue[playerTurn]}'s turn...**`, files: [image], ephemeral: true });
+			}
+		});
+
+		global.playerTurn = playerTurn;
+
+		global.client.on(Events.InteractionCreate, async interaction => {
+			if (!interaction.isStringSelectMenu()) return;
+			if (interaction.customId !== 'stat') return;
+			const chosenStat = interaction.values;
+			global.chosenStat = chosenStat;
+			await execute('./round.js');
 		});
 	},
 };

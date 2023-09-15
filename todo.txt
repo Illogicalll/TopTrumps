@@ -1,0 +1,6 @@
+- Implement round draws
+- Properly End Game
+- Limit usage of ingame commands
+- Show what stats people had when it says the winner of that round
+- Stalemate (Maybe after 5 rounds?)
+- Fix globals

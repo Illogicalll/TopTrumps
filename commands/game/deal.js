@@ -31,6 +31,8 @@ function shuffle(array) {
 
 function distributeCards(deck, numPlayers) {
 	const playerHands = [];
+	const totalCards = deck.length - 2;
+	global.totalCards = totalCards;
 
 	for (let i = 0; i < numPlayers; i++) {
 		playerHands.push([]);
@@ -105,6 +107,7 @@ module.exports = {
 			.addOptions(statNames.map(name => { return { label: name, value: name }; }));
 		const row = new ActionRowBuilder()
 			.addComponents(select);
+		global.row = row;
 
 		global.userIDQueue.forEach(id => {
 			const servingUser = global.userIDQueue.indexOf(id);
